@@ -3,6 +3,7 @@ package com.example.delivery_fee_calculator.service;
 import com.example.delivery_fee_calculator.entity.Weather;
 import java.util.List;
 
+// Interface for CRUD operations
 public interface WeatherService {
     // Save operation
     Weather saveWeather(Weather weather);

@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Temp Functionality Test Code ###
+src/main/java/Test_Funct.java

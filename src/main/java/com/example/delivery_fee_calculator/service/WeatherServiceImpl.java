@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-// Class
+// Class for CRUD operations implementation
 public class WeatherServiceImpl implements WeatherService {
 
     @Autowired
@@ -21,10 +21,10 @@ public class WeatherServiceImpl implements WeatherService {
         return weatherRepository.save(weather);
     }
 
-    // Get all weather information from db
+    // Get all weather information from db, order by timestamp descending order
     @Override
     public List<Weather> fetchWeatherList() {
-        return (List<Weather>) weatherRepository.findAll();
+        return weatherRepository.findAllByOrderByTimestampDesc();
     }
 
     // Update weather information by id
@@ -33,11 +33,10 @@ public class WeatherServiceImpl implements WeatherService {
         Weather wetDB;
 
         // Try to find the weather from database
-        try {
+        if (weatherRepository.findById(weatherId).isPresent())
             wetDB = weatherRepository.findById(weatherId).get();
-        } catch (Exception e) {
-            throw new RuntimeException();
-        }
+        else throw new RuntimeException("Weather not found");
+
         // Update station name
         if (Objects.nonNull(weather.getName()) && !"".equalsIgnoreCase(weather.getName())) {
             wetDB.setName(weather.getName());
@@ -64,7 +63,7 @@ public class WeatherServiceImpl implements WeatherService {
         }
 
         // Update observation timestamp
-        if (Objects.nonNull(weather.getTimestamp()) && !"".equalsIgnoreCase(weather.getTimestamp())) {
+        if (Objects.nonNull(weather.getTimestamp())) {
             wetDB.setTimestamp(weather.getTimestamp());
         }
 

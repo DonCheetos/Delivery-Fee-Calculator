@@ -10,6 +10,8 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Document;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
@@ -19,62 +21,85 @@ public class WeatherImportService {
     @Autowired
     private WeatherService weatherService;
 
-    //@Scheduled(cron = "0 15 * * * ?")
-    @Scheduled(fixedDelay = 5000)
+    // Every hour at minute 15
+    @Scheduled(cron = "0 15 * * * ?")
+    //@Scheduled(fixedDelay = 10000)
     // Reads data from weather portal of the Estonian Environment Agency and saves it into DB
-    public void importWeatherData() {
-
-        System.out.println("importWeatherData triggered at " + java.time.LocalDateTime.now());
+    private void importWeatherData() {
+        System.out.println("ImportWeatherData triggered at " + java.time.LocalDateTime.now());
         try {
             // Create a DocumentBuilder
-            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
 
-            // Parse the XML content from a page
-            Document document = builder.parse(new URL("https://www.ilmateenistus.ee/ilma_andmed/xml/observations.php").openStream());
+            System.out.println("Fetching XML data...");
 
-            // Normalize in other words clean up the XML document structure, for less error-prone solution
-            document.getDocumentElement().normalize();
+            // Since URL is deprecated, Will use URI instead
+            URL url = URI.create("https://www.ilmateenistus.ee/ilma_andmed/xml/observations.php").toURL();
 
-            // Get the root element (the <observations> element)
-            Element root = document.getDocumentElement();
 
-            // Retrieve the "timestamp" attribute as a String
-            String timestampStr = root.getAttribute("timestamp");
+            // Try-with-resources ensures InputStream is closed
+            try (InputStream stream = url.openStream()) {
+                // Parse the XML document directly from InputStream
+                Document document = builder.parse(stream);
 
-            // List of observations we care about
-            final List<String> allowedList = List.of("Tallinn-Harku", "Tartu-Tõravere", "Pärnu");
+                // Normalize document (to avoid issues with different XML formatting)
+                document.getDocumentElement().normalize();
 
-            NodeList nodeList = root.getElementsByTagName("observation");
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node node = nodeList.item(i);
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    Element element = (Element) node;
-                    if (allowedList.contains(element.getAttribute("name"))) {
+                // Get the root element
+                Element root = document.getDocumentElement();
 
-                        // Read in observation data
-                        String name = element.getAttribute("name");
-                        String wmo = element.getAttribute("wmocode");
-                        Double airtemperature = Double.parseDouble(element.getAttribute("airtemperature"));
-                        Double windspeed = Double.parseDouble(element.getAttribute("windspeed"));
-                        String phenomenon  = element.getAttribute("phenomenon");
+                // Retrieve the "timestamp" attribute
+                Long timestamp = Long.valueOf(root.getAttribute("timestamp"));
 
-                        // New object weather
-                        Weather weather = new Weather();
-                        weather.setTimestamp(timestampStr);
-                        weather.setName(name);
-                        weather.setWmo(wmo);
-                        weather.setTemp(airtemperature);
-                        weather.setWind(windspeed);
-                        weather.setPhenomenon(phenomenon);
+                // List of observations we care about
+                final List<String> allowedList = List.of("Tallinn-Harku", "Tartu-Tõravere", "Pärnu");
 
-                        // Save into DB
-                        weatherService.saveWeather(weather);
+                // Get all <station> elements from root element "observations"
+                NodeList nodeList = root.getElementsByTagName("station");
+
+                for (int i = 0; i < nodeList.getLength(); i++) {
+                    Node node = nodeList.item(i);
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        Element element = (Element) node;
+
+                        String name = getElementText(element, "name");
+
+                        if (allowedList.contains(name)) {
+                            // Read observation data safely
+
+                            String wmo = getElementText(element, "wmocode");
+                            Double airtemperature = Double.valueOf(getElementText(element,"airtemperature"));
+                            Double windspeed = Double.valueOf(getElementText(element,"windspeed"));
+                            String phenomenon = getElementText(element,"phenomenon");
+
+                            // Create a Weather object
+                            Weather weather = new Weather();
+                            weather.setTimestamp(timestamp);
+                            weather.setName(name);
+                            weather.setWmo(wmo);
+                            weather.setTemp(airtemperature);
+                            weather.setWind(windspeed);
+                            weather.setPhenomenon(phenomenon);
+
+                            // Save information into DB
+                            weatherService.saveWeather(weather);
+                        }
                     }
                 }
+                System.out.println("Saved weather information, timestamp: " + timestamp);
             }
-        } catch(Exception e) {
-            e.printStackTrace(); // or use a proper logging framework
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
 
+    // Utility method to get text content of an element
+    private static String getElementText(Element element, String tagName) {
+        NodeList nodeList = element.getElementsByTagName(tagName);
+        if (nodeList.getLength() > 0) {
+            return nodeList.item(0).getTextContent().trim();
+        }
+        return "";
     }
 }
