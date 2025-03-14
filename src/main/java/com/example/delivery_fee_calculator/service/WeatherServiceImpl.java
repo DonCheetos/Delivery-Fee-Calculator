@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 // Class for CRUD operations implementation
@@ -23,8 +24,14 @@ public class WeatherServiceImpl implements WeatherService {
 
     // Get all weather information from db, order by timestamp descending order
     @Override
-    public List<Weather> fetchWeatherList() {
+    public List<Weather> fetchWeatherListOrdered() {
         return weatherRepository.findAllByOrderByTimestampDesc();
+    }
+
+    // Gets all weather information of specific station, ordered by timestamp descending order
+    @Override
+    public List<Weather> fetchWeatherByStation(String station) {
+        return weatherRepository.findByNameOrderByTimestampDesc(station);
     }
 
     // Update weather information by id

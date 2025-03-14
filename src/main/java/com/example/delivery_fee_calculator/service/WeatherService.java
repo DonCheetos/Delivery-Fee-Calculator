@@ -8,8 +8,10 @@ public interface WeatherService {
     // Save operation
     Weather saveWeather(Weather weather);
 
-    // Read operation
-    List<Weather> fetchWeatherList();
+    // Read all operation (Ordered)
+    List<Weather> fetchWeatherListOrdered();
+
+    List<Weather> fetchWeatherByStation(String station);
 
     // Update operation
     Weather updateWeather(Weather weather, Long weatherId);

@@ -24,7 +24,7 @@ public class WeatherController {
     // Read operation
     @GetMapping("/weather")
     public List<Weather> fetchWeather() {
-        return weatherService.fetchWeatherList();
+        return weatherService.fetchWeatherListOrdered();
     }
 
     // Update operation
