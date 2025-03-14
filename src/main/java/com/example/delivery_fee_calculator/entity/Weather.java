@@ -34,6 +34,6 @@ public class Weather {
     @Column(nullable = false)
     private String phenomenon;
 
-    @Column(name = "timestamp",nullable = false)
+    @Column(nullable = false)
     private Long timestamp;
 }
