@@ -2,83 +2,37 @@ package com.example.delivery_fee_calculator.service;
 
 import com.example.delivery_fee_calculator.entity.Weather;
 import com.example.delivery_fee_calculator.repository.WeatherRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 
+/**
+ * Service implementation that provides operations for weather data.
+ * <p>
+ *     This service currently supports saving a new weather record and retrieving weather records
+ *     for a specific station, ordered by timestamp in descending order.
+ * </p>
+ *
+ */
 @Service
-// Class for CRUD operations implementation
 public class WeatherServiceImpl implements WeatherService {
 
-    @Autowired
-    private WeatherRepository weatherRepository;
+    private final WeatherRepository weatherRepository;
+
+    // Constructor Injection: Spring automatically injects the required beans
+    public WeatherServiceImpl(WeatherRepository weatherRepository) {
+        this.weatherRepository = weatherRepository;
+    }
 
     // Save weather information into db
     @Override
-    public Weather saveWeather(Weather weather) {
-        return weatherRepository.save(weather);
-    }
-
-    // Get all weather information from db, order by timestamp descending order
-    @Override
-    public List<Weather> fetchWeatherListOrdered() {
-        return weatherRepository.findAllByOrderByTimestampDesc();
+    public void saveWeather(Weather weather) {
+        weatherRepository.save(weather);
     }
 
     // Gets all weather information of specific station, ordered by timestamp descending order
     @Override
     public List<Weather> fetchWeatherByStation(String station) {
         return weatherRepository.findByNameOrderByTimestampDesc(station);
-    }
-
-    // Update weather information by id
-    @Override
-    public Weather updateWeather(Weather weather, Long weatherId) {
-        Weather wetDB;
-
-        // Try to find the weather from database
-        if (weatherRepository.findById(weatherId).isPresent())
-            wetDB = weatherRepository.findById(weatherId).get();
-        else throw new RuntimeException("Weather not found");
-
-        // Update station name
-        if (Objects.nonNull(weather.getName()) && !"".equalsIgnoreCase(weather.getName())) {
-            wetDB.setName(weather.getName());
-        }
-
-        // Update station WMO
-        if (Objects.nonNull(weather.getWmo()) && !"".equalsIgnoreCase(weather.getWmo())) {
-            wetDB.setWmo(weather.getWmo());
-        }
-
-        // Update weather Temp
-        if (Objects.nonNull(weather.getTemp())) {
-            wetDB.setTemp(weather.getTemp());
-        }
-
-        // Update weather Wind
-        if (Objects.nonNull(weather.getWind())) {
-            wetDB.setWind(weather.getWind());
-        }
-
-        // Update weather Phenomenon
-        if (Objects.nonNull(weather.getPhenomenon()) && !"".equalsIgnoreCase(weather.getPhenomenon())) {
-            wetDB.setPhenomenon(weather.getPhenomenon());
-        }
-
-        // Update observation timestamp
-        if (Objects.nonNull(weather.getTimestamp())) {
-            wetDB.setTimestamp(weather.getTimestamp());
-        }
-
-        return weatherRepository.save(wetDB);
-    }
-
-    // Delete weather information by id
-    @Override
-    public void deleteWeatherById(Long weatherId) {
-        weatherRepository.deleteById(weatherId);
     }
 }

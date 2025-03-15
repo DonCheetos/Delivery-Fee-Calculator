@@ -6,12 +6,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Entity representing weather data for storage in the database
+ *
+ * <p>
+ *     Using lombok for reduction of boilerplate code
+ * </p>
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
 @Entity
-// Class
 public class Weather {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -21,7 +27,7 @@ public class Weather {
     @Column(nullable = false)
     private String name;
 
-    // Assumming WMO code for the station can not be Null
+    // Assuming WMO code for the station can not be Null
     @Column(nullable = false)
     private String wmo;
 

@@ -4,26 +4,74 @@ import com.example.delivery_fee_calculator.entity.Delivery;
 import com.example.delivery_fee_calculator.entity.Weather;
 import com.example.delivery_fee_calculator.service.WeatherService;
 import com.example.delivery_fee_calculator.service.fee.DeliveryFeeService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// Delivery fee calculation REST api
+/**
+ * <!DOCTYPE html>
+ * <html>
+ *    Delivery fee calculation REST interface.
+ *    <p>
+ *       This REST controller provides an endpoint to calculate the delivery fee based on the provided city
+ *       and vehicle type. The calculation takes into account the latest weather data retrieved from the database.
+ *    </p>
+ *    <p>
+ *       <b>Accepted JSON Input Format (Example):</b>
+ *    <pre>
+ *   {
+ *     "city": "Tallinn",
+ *     "vehicle": "Car"
+ *   }
+ *   </pre>
+ *    </p>
+ *    <p>
+ *       <b>Allowed Values:</b>
+ *    <ul>
+ *       <li><b>city</b>: "Tallinn", "Tartu", "Pärnu"</li>
+ *       <li><b>vehicle</b>: "Car", "Scooter", "Bike"</li>
+ *    </ul>
+ *    </p>
+ *    <p><b>Response:</b>
+ *    <ul>
+ *       <li>HTTP 200 with the calculated delivery fee (number) on success.</li>
+ *       <li>
+ *          HTTP 400 with an error message on failure:
+ *          <ul>
+ *             <li>"error: city not found" - if the provided city is not in the allowed list. List of allowed: "Tallinn", "Tartu", "Pärnu"</li>
+ *             <li>"error: Weather data not available" - if no weather data is found for the city.</li>
+ *             <li>"error: Usage of selected vehicle type is forbidden" - if business rules disallow the selected vehicle type.</li>
+ *          </ul>
+ *       </li>
+ *    </ul>
+ *    </p>
+ * </html>
+ */
 @RestController
 public class DeliveryFeeController {
-    @Autowired
-    private DeliveryFeeService deliveryFeeService;
 
-    @Autowired
-    private WeatherService weatherService;
+    private final DeliveryFeeService deliveryFeeService;
 
-    // POST request for calculating the total delivery fee
+    private final WeatherService weatherService;
+
+    // Constructor Injection: Spring automatically injects the required beans
+    public DeliveryFeeController(DeliveryFeeService deliveryFeeService, WeatherService weatherService) {
+        this.deliveryFeeService = deliveryFeeService;
+        this.weatherService = weatherService;
+    }
+
+    /**
+     * Calculates the total delivery fee based on city, vehicle type, and current weather conditions.
+     *
+     * @param delivery A JSON object containing "city" and "vehicle" parameters.
+     * @return A ResponseEntity containing either the calculated fee (HTTP 200) or an error message (HTTP 400).
+     */
     @PostMapping("/delivery/fee")
-    public ResponseEntity<?> deliveryFee(@RequestBody Delivery delivery) {
+    public ResponseEntity<?> deliveryFee(@Validated @RequestBody Delivery delivery) {
         // Cleaning and formatting of data
         String city = delivery.city().toLowerCase().trim();
         String vehicle = delivery.vehicle().toLowerCase().trim();
@@ -34,8 +82,10 @@ public class DeliveryFeeController {
         stationCityRelation.put("pärnu", "Pärnu");
         stationCityRelation.put("tallinn", "Tallinn-Harku");
 
+        // Valdiates the city is in the known list
         if (!stationCityRelation.containsKey(city)) return ResponseEntity.badRequest().body("error: city not found");
 
+        // Get list of weathers by station
         List<Weather> weatherList = weatherService.fetchWeatherByStation(stationCityRelation.get(city));
 
         // Make sure the weather information exists
@@ -45,8 +95,10 @@ public class DeliveryFeeController {
         // Retrieve the first available weather record
         Weather weather = weatherList.getFirst();
 
+        // Calculate the delivery fee with provided city, vehicle and weather information
         Double fee = deliveryFeeService.deliveryFeeCalculator(city,vehicle,weather.getTemp(),weather.getWind(),weather.getPhenomenon());
 
+        // If the usage of vehicle type is forbidden
         if (fee == null) {
             return ResponseEntity.badRequest().body("error: Usage of selected vehicle type is forbidden");
         }

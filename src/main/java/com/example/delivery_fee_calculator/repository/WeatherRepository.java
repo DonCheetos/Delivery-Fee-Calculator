@@ -8,13 +8,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * Interface extending CrudRepository, for database operations. Interface currently is meant for "Weather" entity
+ */
 @Repository
-// Interface extending CrudRepository
 public interface WeatherRepository extends CrudRepository<Weather, Long> {
-
-    // Fetch weather data ordered by timestamp descending
-    @Query("SELECT w FROM Weather w ORDER BY w.timestamp DESC")
-    List<Weather> findAllByOrderByTimestampDesc();
 
     // Filters by station name and orders by timestamp descending
     @Query("SELECT w from Weather w WHERE w.name = :name ORDER BY w.timestamp DESC")

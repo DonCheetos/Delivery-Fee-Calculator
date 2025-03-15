@@ -49,12 +49,12 @@ public class DeliveryFeeServiceTest {
     }
 
     /**
-     *  Tests for exta fee calculation and weather conditons
+     *  Tests for extra fee calculation and weather conditions
      */
     @Test
     void testExtraFeeCalculation(){
 
-        // Boundry Value analysis for air temprature (ATEF)
+        // Boundary Value analysis for air temperature (ATEF)
         assertEquals(4.0, deliveryFeeService.deliveryFeeCalculator("Tallinn", "Scooter", -10.0, 0.0, "Clear"));
         assertEquals(3.5, deliveryFeeService.deliveryFeeCalculator("Tallinn", "Bike", 0.0, 0.0, "Clear"));
         assertEquals(3.5, deliveryFeeService.deliveryFeeCalculator("Tallinn", "Scooter", 0.1, 0.0, "Clear"));
@@ -72,17 +72,20 @@ public class DeliveryFeeServiceTest {
         assertEquals(3.0, deliveryFeeService.deliveryFeeCalculator("Tallinn", "BIKE", 10.0, 0.0, "Overcast"));
         assertEquals(3.5, deliveryFeeService.deliveryFeeCalculator("Tallinn", "Scooter", 10.0, 0.0, "Overcast"));
 
-        assertEquals(3.5,deliveryFeeService.deliveryFeeCalculator("Tallinn", "Bike", 10.0, 0.0, "Cloudy and little rain"));
-        assertEquals(4.0,deliveryFeeService.deliveryFeeCalculator("Tallinn", "Scooter", 10.0, 0.0, "Cloudy and little rain"));
+        assertEquals(3.5,deliveryFeeService.deliveryFeeCalculator("Tallinn", "Bike", 10.0, 0.0, "Light rain"));
+        assertEquals(4.0,deliveryFeeService.deliveryFeeCalculator("Tallinn", "Scooter", 10.0, 0.0, "Light rain"));
 
-        assertEquals(4.0,deliveryFeeService.deliveryFeeCalculator("Tallinn", "Bike", 10.0, 0.0, "Cloudy and snowing"));
-        assertEquals(4.5,deliveryFeeService.deliveryFeeCalculator("Tallinn", "Scooter", 10.0, 0.0, "Cloudy and snowing"));
+        assertEquals(4.0,deliveryFeeService.deliveryFeeCalculator("Tallinn", "Bike", 10.0, 0.0, "Heavy snow shower"));
+        assertEquals(4.5,deliveryFeeService.deliveryFeeCalculator("Tallinn", "Scooter", 10.0, 0.0, "Heavy snow shower"));
+
+        assertEquals(4.0,deliveryFeeService.deliveryFeeCalculator("Tallinn", "Bike", 10.0, 0.0, "Light sleet"));
+        assertEquals(4.5,deliveryFeeService.deliveryFeeCalculator("Tallinn", "Scooter", 10.0, 0.0, "Light sleet"));
 
         assertNull(deliveryFeeService.deliveryFeeCalculator("Tallinn", "BIKE", 10.0, 0.0, "Heavy Clouds with thunder"));
         assertNull(deliveryFeeService.deliveryFeeCalculator("Tallinn", "SCOOTER", 10.0, 0.0, "Heavy Clouds with thunder"));
 
-        assertNull(deliveryFeeService.deliveryFeeCalculator("Tallinn", "BIKE", 10.0, 0.0, "Heavy glaze"));
-        assertNull(deliveryFeeService.deliveryFeeCalculator("Tallinn", "SCOOTER", 10.0, 0.0, "Heavy glaze"));
+        assertNull(deliveryFeeService.deliveryFeeCalculator("Tallinn", "BIKE", 10.0, 0.0, "Glaze"));
+        assertNull(deliveryFeeService.deliveryFeeCalculator("Tallinn", "SCOOTER", 10.0, 0.0, "Glaze"));
 
         assertNull(deliveryFeeService.deliveryFeeCalculator("Tallinn", "BIKE", 10.0, 0.0, "Heavy hail"));
         assertNull(deliveryFeeService.deliveryFeeCalculator("Tallinn", "SCOOTER", 10.0, 0.0, "Heavy hail"));
@@ -106,7 +109,7 @@ public class DeliveryFeeServiceTest {
      */
     @Test
     void testCombinedExtraFeesForBike() {
-        assertEquals(4.5, deliveryFeeService.deliveryFeeCalculator("Tallinn", "Bike", -5.0, 15.0, "rain"));
+        assertEquals(4.5, deliveryFeeService.deliveryFeeCalculator("Tallinn", "Bike", -5.0, 15.0, "Moderate rain"));
     }
 
     /**
@@ -114,7 +117,7 @@ public class DeliveryFeeServiceTest {
      */
     @Test
     void testCombinedExtraFeesForScooter() {
-        assertEquals(5.0, deliveryFeeService.deliveryFeeCalculator("Tartu", "Scooter", -15.0, 5.0, "snow"));
+        assertEquals(5.0, deliveryFeeService.deliveryFeeCalculator("Tartu", "Scooter", -15.0, 5.0, "Light snowfall"));
     }
 
     /**
@@ -122,6 +125,6 @@ public class DeliveryFeeServiceTest {
      */
     @Test
     void testCarUnderAdverseWeather() {
-        assertEquals(4.0, deliveryFeeService.deliveryFeeCalculator("Tallinn", "Car", -20.0, 25.0, "hail"));
+        assertEquals(4.0, deliveryFeeService.deliveryFeeCalculator("Tallinn", "Car", -20.0, 25.0, "Hail"));
     }
 }

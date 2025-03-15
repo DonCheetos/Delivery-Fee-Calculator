@@ -3,19 +3,22 @@ package com.example.delivery_fee_calculator.service;
 import com.example.delivery_fee_calculator.entity.Weather;
 import java.util.List;
 
-// Interface for CRUD operations
+/**
+ * Interface for weather data CRUD operations.
+ */
 public interface WeatherService {
-    // Save operation
-    Weather saveWeather(Weather weather);
+    /**
+     * Save operation
+     *
+     * @param weather weather information object for saving
+     */
+    void saveWeather(Weather weather);
 
-    // Read all operation (Ordered)
-    List<Weather> fetchWeatherListOrdered();
-
+    /**
+     * Read all operation, filtered by station
+     *
+     * @param station takes station name as input
+     * @return returns list of weather information by station name
+     */
     List<Weather> fetchWeatherByStation(String station);
-
-    // Update operation
-    Weather updateWeather(Weather weather, Long weatherId);
-
-    // Delete operation
-    void deleteWeatherById(Long weatherId);
 }

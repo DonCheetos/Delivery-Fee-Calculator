@@ -15,15 +15,21 @@ import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
+/**
+ * Service that imports weather information from the weather portal, every certain given time
+ */
 @Service
 public class WeatherImportService {
 
-    @Autowired
-    private WeatherService weatherService;
+    private final WeatherService weatherService;
+
+    // Constructor Injection: Spring automatically injects the required beans
+    public WeatherImportService(WeatherService weatherService) {
+        this.weatherService = weatherService;
+    }
 
     // Every hour at minute 15
     @Scheduled(cron = "0 15 * * * ?")
-    //@Scheduled(fixedDelay = 10000)
     // Reads data from weather portal of the Estonian Environment Agency and saves it into DB
     private void importWeatherData() {
         System.out.println("ImportWeatherData triggered at " + java.time.LocalDateTime.now());
