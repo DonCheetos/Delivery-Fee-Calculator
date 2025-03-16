@@ -38,13 +38,13 @@ import java.util.Map;
  *    </p>
  *    <p><b>Response:</b>
  *    <ul>
- *       <li>HTTP 200 with the calculated delivery fee (number) on success.</li>
+ *       <li>HTTP 200 with the calculated delivery fee {@code {"fee" : value_given}} on success.</li>
  *       <li>
  *          HTTP 400 with an error message on failure:
  *          <ul>
- *             <li>"error: city not found" - if the provided city is not in the allowed list. List of allowed: "Tallinn", "Tartu", "Pärnu"</li>
- *             <li>"error: Weather data not available" - if no weather data is found for the city.</li>
- *             <li>"error: Usage of selected vehicle type is forbidden" - if business rules disallow the selected vehicle type.</li>
+ *             <li>{@code {"error": "City not found"}} - if the provided city is not in the allowed list. List of allowed: "Tallinn", "Tartu", "Pärnu"</li>
+ *             <li>{@code {"error" : "Weather data not available"}} - if no weather data is found for the city.</li>
+ *             <li>{@code {"error" : "Usage of selected vehicle type is forbidden"}} - if business rules disallow the selected vehicle type.</li>
  *          </ul>
  *       </li>
  *    </ul>
@@ -83,14 +83,14 @@ public class DeliveryFeeController {
         stationCityRelation.put("tallinn", "Tallinn-Harku");
 
         // Valdiates the city is in the known list
-        if (!stationCityRelation.containsKey(city)) return ResponseEntity.badRequest().body("error: city not found");
+        if (!stationCityRelation.containsKey(city)) return ResponseEntity.badRequest().body(Map.of("error", "City not found"));
 
         // Get list of weathers by station
         List<Weather> weatherList = weatherService.fetchWeatherByStation(stationCityRelation.get(city));
 
         // Make sure the weather information exists
         if (weatherList.isEmpty()) {
-            return ResponseEntity.badRequest().body("error: Weather data not available");
+            return ResponseEntity.badRequest().body(Map.of("error", "Weather data not available"));
         }
         // Retrieve the first available weather record
         Weather weather = weatherList.getFirst();
@@ -100,8 +100,8 @@ public class DeliveryFeeController {
 
         // If the usage of vehicle type is forbidden
         if (fee == null) {
-            return ResponseEntity.badRequest().body("error: Usage of selected vehicle type is forbidden");
+            return ResponseEntity.badRequest().body(Map.of("error","Usage of selected vehicle type is forbidden"));
         }
-        return ResponseEntity.ok(fee);
+        return ResponseEntity.ok(Map.of("fee", fee));
     }
 }
