@@ -1,13 +1,13 @@
 package com.example.delivery_fee_calculator.service;
 
 import com.example.delivery_fee_calculator.entity.Weather;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Document;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
@@ -23,37 +23,56 @@ public class WeatherImportService {
 
     private final WeatherService weatherService;
 
-    // Constructor Injection: Spring automatically injects the required beans
+    /**
+     * Constructs a WeatherServiceImpl with the given WeatherService.
+     * <p>
+     *     Spring Boot will automatically inject the WeatherService bean via constructor injection.
+     * </p>
+     *
+     * @param weatherService the WeatherRepository bean injected by Spring
+     */
     public WeatherImportService(WeatherService weatherService) {
         this.weatherService = weatherService;
     }
 
-    // Every hour at minute 15
-    @Scheduled(cron = "0 15 * * * ?")
-    // Reads data from weather portal of the Estonian Environment Agency and saves it into DB
+    /**
+     * Scheduled method that triggers the weather data import based on cron configuration.
+     *
+     * <p>
+     *     The cron expression is defined in application.properties. Key in use: {@code weather.import.cron}
+     * </p>
+     *
+     */
+    //
+    @Scheduled(cron = "${weather.import.cron}")
+    public void scheduledTrigger() {
+        importWeatherData();
+    }
+
+    /**
+     * Reads data from weather portal of the Estonian Environment Agency and saves it into database
+     *
+     * <p>
+     *     Currently saves only "Tallinn-Harku", "Tartu-Tõravere", "Pärnu" observations
+     * </p>
+     */
     private void importWeatherData() {
         System.out.println("ImportWeatherData triggered at " + java.time.LocalDateTime.now());
         try {
-            // Create a DocumentBuilder
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-
             System.out.println("Fetching XML data...");
 
             // Since URL is deprecated, Will use URI instead
             URL url = URI.create("https://www.ilmateenistus.ee/ilma_andmed/xml/observations.php").toURL();
 
+            try (InputStream in = url.openStream()) {
+                // Extracts XML root from the URL given
+                Element root = parseXML(in);
 
-            // Try-with-resources ensures InputStream is closed
-            try (InputStream stream = url.openStream()) {
-                // Parse the XML document directly from InputStream
-                Document document = builder.parse(stream);
+                // Return early if root was null
+                if (root == null) return;
 
-                // Normalize document (to avoid issues with different XML formatting)
-                document.getDocumentElement().normalize();
-
-                // Get the root element
-                Element root = document.getDocumentElement();
+                // List of station element nodes
+                NodeList nodeList = root.getElementsByTagName("station");
 
                 // Retrieve the "timestamp" attribute
                 Long timestamp = Long.valueOf(root.getAttribute("timestamp"));
@@ -61,8 +80,6 @@ public class WeatherImportService {
                 // List of observations we care about
                 final List<String> allowedList = List.of("Tallinn-Harku", "Tartu-Tõravere", "Pärnu");
 
-                // Get all <station> elements from root element "observations"
-                NodeList nodeList = root.getElementsByTagName("station");
 
                 for (int i = 0; i < nodeList.getLength(); i++) {
                     Node node = nodeList.item(i);
@@ -75,9 +92,9 @@ public class WeatherImportService {
                             // Read observation data safely
 
                             String wmo = getElementText(element, "wmocode");
-                            Double airtemperature = Double.valueOf(getElementText(element,"airtemperature"));
-                            Double windspeed = Double.valueOf(getElementText(element,"windspeed"));
-                            String phenomenon = getElementText(element,"phenomenon");
+                            Double airtemperature = Double.valueOf(getElementText(element, "airtemperature"));
+                            Double windspeed = Double.valueOf(getElementText(element, "windspeed"));
+                            String phenomenon = getElementText(element, "phenomenon");
 
                             // Create a Weather object
                             Weather weather = new Weather();
@@ -95,9 +112,37 @@ public class WeatherImportService {
                 }
                 System.out.println("Saved weather information, timestamp: " + timestamp);
             }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Parses an XML document from the provided InputStream and returns its root element.
+     *
+     * <p>This method is Public to facilitate testing of XML parsing logic</p>
+     *
+     * @param inputStream InputStream that contains XML
+     * @return XML root element
+     */
+    public Element parseXML(InputStream inputStream){
+        try {
+            // Create a DocumentBuilder
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+
+            // Parse the XML document directly from InputStream
+            Document document = builder.parse(inputStream);
+
+            // Normalize document (to avoid issues with different XML formatting)
+            document.getDocumentElement().normalize();
+
+            // Return the root element
+            return document.getDocumentElement();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     // Utility method to get text content of an element

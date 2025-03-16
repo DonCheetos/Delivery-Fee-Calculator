@@ -10,7 +10,13 @@ public class DeliveryFeeService {
 
     /**
      * Calculates the total delivery fee based on city, vehicle, and weather conditions.
-     * Returns null if vehicle usage is forbidden or if given inputs are invalid.
+     *
+     * @param city city name for input, currently allowed cities are Tartu, Pärnu and Tallinn
+     * @param vehicle vehicle type for input, currently allowed types are scooter, car and bike
+     * @param air_temprature air temperature for input
+     * @param wind_speed wind speed for input
+     * @param weather_phenomenon weather phenomenon for input
+     * @return null if vehicle usage is forbidden or if given inputs are invalid, otherwise delivery fee
      */
     public Double deliveryFeeCalculator(String city, String vehicle, Double air_temprature, Double wind_speed, String weather_phenomenon){
         // Ensure no null values are given

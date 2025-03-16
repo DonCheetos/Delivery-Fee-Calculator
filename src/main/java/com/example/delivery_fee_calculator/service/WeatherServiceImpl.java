@@ -19,18 +19,34 @@ public class WeatherServiceImpl implements WeatherService {
 
     private final WeatherRepository weatherRepository;
 
-    // Constructor Injection: Spring automatically injects the required beans
+    /**
+     * Constructs a WeatherServiceImpl with the given WeatherRepository.
+     * <p>
+     *     Spring Boot will automatically inject the WeatherRepository bean via constructor injection.
+     * </p>
+     *
+     * @param weatherRepository the WeatherRepository bean injected by Spring
+     */
     public WeatherServiceImpl(WeatherRepository weatherRepository) {
         this.weatherRepository = weatherRepository;
     }
 
-    // Save weather information into db
+    /**
+     * Saves weather information into database
+     *
+     * @param weather weather information object for saving
+     */
     @Override
     public void saveWeather(Weather weather) {
         weatherRepository.save(weather);
     }
 
-    // Gets all weather information of specific station, ordered by timestamp descending order
+    /**
+     * Gets all weather information of specific station, ordered by timestamp descending order
+     *
+     * @param station Takes station name as input
+     * @return Returns list of Weather entities
+     */
     @Override
     public List<Weather> fetchWeatherByStation(String station) {
         return weatherRepository.findByNameOrderByTimestampDesc(station);

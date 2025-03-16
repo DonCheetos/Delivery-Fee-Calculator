@@ -6,12 +6,18 @@
 
 	/**
 	 * Main entry point for delivery fee calculator application.
-	 * <p> This class starts up Spring Boot application and enables scheduling for periodic tasks</p>
+	 * <p>
+	 *     This class starts up Spring Boot application and enables scheduling for periodic tasks
+	 * </p>
 	 */
 	@SpringBootApplication
 	@EnableScheduling
 	public class DeliveryFeeCalculatorApplication {
 
+		/**
+		 * Runs Delivery Fee Calculator Application
+		 *
+		 */
 		public static void main(String[] args) {
 			SpringApplication.run(DeliveryFeeCalculatorApplication.class, args);
 		}

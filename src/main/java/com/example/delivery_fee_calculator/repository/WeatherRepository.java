@@ -14,7 +14,12 @@ import java.util.List;
 @Repository
 public interface WeatherRepository extends CrudRepository<Weather, Long> {
 
-    // Filters by station name and orders by timestamp descending
+    /**
+     * Filters by station name and orders by timestamp descending
+     *
+     * @param name Given station name for filtering
+     * @return Returns a list of Weather entities filtered by station name and ordered by timestamp descending
+     */
     @Query("SELECT w from Weather w WHERE w.name = :name ORDER BY w.timestamp DESC")
     List<Weather> findByNameOrderByTimestampDesc(@Param("name") String name);
 }

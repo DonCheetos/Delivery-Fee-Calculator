@@ -1,11 +1,16 @@
-package com.example.delivery_fee_calculator;
+package com.example.delivery_fee_calculator.service.fee;
 
-import com.example.delivery_fee_calculator.service.fee.DeliveryFeeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+/**
+ * Tests delivery fee calculation service functionality and if business rules were correctly implemented
+ */
+@SpringBootTest
 public class DeliveryFeeServiceTest {
 
     // Declare the service
