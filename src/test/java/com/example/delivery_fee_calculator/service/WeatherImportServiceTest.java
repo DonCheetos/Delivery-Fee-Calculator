@@ -41,29 +41,30 @@ public class WeatherImportServiceTest {
      */
     @Test
     public void testXMLParse() {
-        String testXML ="<observations timestamp=\"1742135859\">"+
-                        "<station>\n" +
-                        "<name>Tallinn-Harku</name>\n" +
-                        "<wmocode>26038</wmocode>\n" +
-                        "<longitude>24.602891666624284</longitude>\n" +
-                        "<latitude>59.398122222355134</latitude>\n" +
-                        "<phenomenon>Clear</phenomenon>\n" +
-                        "<visibility>35.0</visibility>\n" +
-                        "<precipitations>0</precipitations>\n" +
-                        "<airpressure>1009.3</airpressure>\n" +
-                        "<relativehumidity>47</relativehumidity>\n" +
-                        "<airtemperature>1.1</airtemperature>\n" +
-                        "<winddirection>313</winddirection>\n" +
-                        "<windspeed>2</windspeed>\n" +
-                        "<windspeedmax>4.8</windspeedmax>\n" +
-                        "<waterlevel/>\n" +
-                        "<waterlevel_eh2000/>\n" +
-                        "<watertemperature/>\n" +
-                        "<uvindex>0.8</uvindex>\n" +
-                        "<sunshineduration>459</sunshineduration>\n" +
-                        "<globalradiation>338</globalradiation>\n" +
-                        "</station>"+
-                        "</observations>";
+        String testXML = """
+                <observations timestamp="1742135859">
+                <station>
+                <name>Tallinn-Harku</name>
+                <wmocode>26038</wmocode>
+                <longitude>24.602891666624284</longitude>
+                <latitude>59.398122222355134</latitude>
+                <phenomenon>Clear</phenomenon>
+                <visibility>35.0</visibility>
+                <precipitations>0</precipitations>
+                <airpressure>1009.3</airpressure>
+                <relativehumidity>47</relativehumidity>
+                <airtemperature>1.1</airtemperature>
+                <winddirection>313</winddirection>
+                <windspeed>2</windspeed>
+                <windspeedmax>4.8</windspeedmax>
+                <waterlevel/>
+                <waterlevel_eh2000/>
+                <watertemperature/>
+                <uvindex>0.8</uvindex>
+                <sunshineduration>459</sunshineduration>
+                <globalradiation>338</globalradiation>
+                </station>
+                </observations>""";
 
 
 
