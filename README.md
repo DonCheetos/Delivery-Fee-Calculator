@@ -21,7 +21,7 @@ The fee includes regional base fees and extra charges depending on weather condi
 
 ## Getting Started
 
-Run the project:
+Clone the repository and run the project:
 ```bash
 ./gradlew bootRun
 ```
@@ -64,6 +64,7 @@ Weather data is automatically imported every hour, 15 minutes after a full hour 
   "error": "City not found"
 }
 ```
+**This occurs when the given city is unknown.**
 
 ### Error: Weather data not available (400 Bad Request)
 ```json
