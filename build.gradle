@@ -23,9 +23,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
-	// Dev-time reloads
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-
 	// H2 DB
 	runtimeOnly 'com.h2database:h2'
 

@@ -22,4 +22,14 @@ public interface WeatherRepository extends CrudRepository<Weather, Long> {
      */
     @Query("SELECT w from Weather w WHERE w.name = :name ORDER BY w.timestamp DESC")
     List<Weather> findByNameOrderByTimestampDesc(@Param("name") String name);
+
+    /**
+     * Filters by station name and timestamp
+     *
+     * @param name Given station name for filtering
+     * @param timestamp Given timestamp for filtering
+     * @return Returns a Weather entity filtered by station name and timestamp
+     */
+    @Query("SELECT w from Weather w WHERE w.name = :name and w.timestamp= :timestamp")
+    Weather findByNameAndTimestamp(@Param("name") String name, @Param("timestamp") Long timestamp);
 }

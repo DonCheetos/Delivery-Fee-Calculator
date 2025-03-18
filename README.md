@@ -41,6 +41,14 @@ Weather data is automatically imported every hour, 15 minutes after a full hour 
   "vehicle": "Car"
 }
 ```
+*(Optional):*
+```json
+{
+  "city": "Tartu",
+  "vehicle": "Car",
+  "timestamp": 1741972499
+}
+```
 
 ### Successful response (200 OK)
 ```json
@@ -73,4 +81,12 @@ Weather data is automatically imported every hour, 15 minutes after a full hour 
 }
 ```
 **This occurs when there is no weather data in the database to calculate the delivery fee.**
+
+### Error: Invalid JSON provided (400 Bad Request)
+```json
+{
+  "error": "Invalid request body: please provide a valid JSON"
+}
+```
+**This occurs when the provided JSON request is malformed or has missing/wrong fields.**
 

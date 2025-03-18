@@ -51,4 +51,16 @@ public class WeatherServiceImpl implements WeatherService {
     public List<Weather> fetchWeatherByStation(String station) {
         return weatherRepository.findByNameOrderByTimestampDesc(station);
     }
+
+    /**
+     * Gets weather information of specific station and timestamp
+     *
+     * @param station takes station name as input
+     * @param timestamp takes timestamp as input
+     * @return Returns a Weather entity
+     */
+    @Override
+    public Weather fetchWeatherByStationAndTimestamp(String station, Long timestamp) {
+        return weatherRepository.findByNameAndTimestamp(station, timestamp);
+    }
 }

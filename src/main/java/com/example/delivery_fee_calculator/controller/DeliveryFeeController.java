@@ -18,7 +18,8 @@ import java.util.Map;
  *    Delivery fee calculation REST interface.
  *    <p>
  *       This REST controller provides an endpoint to calculate the delivery fee based on the provided city
- *       and vehicle type. The calculation takes into account the latest weather data retrieved from the database.
+ *       and vehicle type. The calculation takes into account the latest weather data retrieved from the database
+ *       or if wanted by timestamp.
  *    </p>
  *    <p>
  *       <b>Accepted JSON Input Format (Example):</b>
@@ -26,6 +27,13 @@ import java.util.Map;
  *   {
  *     "city": "Tallinn",
  *     "vehicle": "Car"
+ *   }
+ *
+ *   <b>(Optional):</b>
+ *   {
+ *       "city": "Tallinn",
+ *       "vehicle": "Car",
+ *       "timestamp": 1741972499
  *   }
  *   </pre>
  *    </p>
@@ -43,8 +51,9 @@ import java.util.Map;
  *          HTTP 400 with an error message on failure:
  *          <ul>
  *             <li>{@code {"error": "City not found"}} - if the provided city is not in the allowed list. List of allowed: "Tallinn", "Tartu", "Pärnu"</li>
- *             <li>{@code {"error" : "Weather data not available"}} - if no weather data is found for the city.</li>
+ *             <li>{@code {"error" : "Weather data not available"}} - if no weather data is found for the city or timestamp.</li>
  *             <li>{@code {"error" : "Usage of selected vehicle type is forbidden"}} - if business rules disallow the selected vehicle type.</li>
+ *             <li>{@code {"error" : "Invalid request body: please provide a valid JSON"}} - if a malformed JSON request was provided or fields are missing/incorrect.</li>
  *          </ul>
  *       </li>
  *    </ul>
@@ -65,9 +74,10 @@ public class DeliveryFeeController {
     }
 
     /**
-     * Calculates the total delivery fee based on city, vehicle type, and current weather conditions.
+     * Calculates the total delivery fee based on city, vehicle type, and weather conditions.
      *
      * @param delivery A JSON object containing "city" and "vehicle" parameters.
+     *                 (Optional) If "timestamp" was also included, sends delivery fee for that period
      * @return A ResponseEntity containing either the calculated fee (HTTP 200) or an error message (HTTP 400).
      */
     @PostMapping("/delivery/fee")
@@ -75,6 +85,7 @@ public class DeliveryFeeController {
         // Cleaning and formatting of data
         String city = delivery.city().toLowerCase().trim();
         String vehicle = delivery.vehicle().toLowerCase().trim();
+        Long timestamp = delivery.timestamp(); // If timestamp was included (Optional)
 
         // Mapping of a city to a weather station
         Map<String, String> stationCityRelation = new HashMap<>();
@@ -85,8 +96,14 @@ public class DeliveryFeeController {
         // Valdiates the city is in the known list
         if (!stationCityRelation.containsKey(city)) return ResponseEntity.badRequest().body(Map.of("error", "City not found"));
 
-        // Get list of weathers by station
-        List<Weather> weatherList = weatherService.fetchWeatherByStation(stationCityRelation.get(city));
+        // Get list of weathers by station. (Optional) List of weathers by station and timestamp
+        List<Weather> weatherList;
+        if (timestamp == null) {
+            weatherList = weatherService.fetchWeatherByStation(stationCityRelation.get(city));
+        } else {
+            Weather weather = weatherService.fetchWeatherByStationAndTimestamp(stationCityRelation.get(city), timestamp);
+            weatherList = (weather != null) ? List.of(weather) : List.of();
+        }
 
         // Make sure the weather information exists
         if (weatherList.isEmpty()) {

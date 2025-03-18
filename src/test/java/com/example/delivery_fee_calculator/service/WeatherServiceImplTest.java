@@ -100,4 +100,40 @@ public class WeatherServiceImplTest {
             Assertions.assertEquals(name + 1, weather.getName());
         }
     }
+
+
+    /**
+     * Tests fetching data from database by station name and timestamp through weather service
+     */
+    @Test
+    public void testFetchWeatherByStationAndTimestamp(){
+        // Test data
+        String name = "Test";
+        String wmo = "Test2";
+        Double temp = 0.0;
+        Double wind = 0.0;
+        String phenomenon = "Test3";
+        Long timestamp = 123455555L;
+        Long timestamp2 = 123451111L;
+
+        // Create multiple Weather entities
+        Weather weather1 = Weather.builder().name(name).wmo(wmo).temp(temp).wind(wind).phenomenon(phenomenon).timestamp(timestamp).build();
+        Weather weather2 = Weather.builder().name(name).wmo(wmo).temp(temp).wind(wind).phenomenon(phenomenon).timestamp(timestamp2).build();
+        Weather weather3 = Weather.builder().name(name+1).wmo(wmo).temp(temp).wind(wind).phenomenon(phenomenon).timestamp(timestamp2).build();
+        Weather weather4 = Weather.builder().name(name).wmo(wmo).temp(temp).wind(wind).phenomenon(phenomenon).timestamp(timestamp).build();
+
+        // Save entities into db
+        weatherService.saveWeather(weather1);
+        weatherService.saveWeather(weather2);
+        weatherService.saveWeather(weather3);
+        weatherService.saveWeather(weather4);
+
+        // Fetch "Test" type entity from db with a timestamp "123451111"
+        Weather testRes = weatherService.fetchWeatherByStationAndTimestamp("Test",123451111L);
+
+        // Test if entity exists
+        Assertions.assertNotNull(testRes);
+
+        Assertions.assertEquals(123451111L, testRes.getTimestamp());
+    }
 }
