@@ -5,7 +5,7 @@
 A REST API that calculates delivery fees based on:
 - City (Tallinn, Tartu, Pärnu)
 - Vehicle type (Car, Scooter, Bike)
-- Latest weather data from the Estonian Environment Agency
+- Latest weather data from the [Estonian Environment Agency](https://www.ilmateenistus.ee/ilma_andmed/xml/observations.php) 
 
 The fee includes regional base fees and extra charges depending on weather conditions.
 
