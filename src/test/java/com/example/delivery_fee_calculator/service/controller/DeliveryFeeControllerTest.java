@@ -80,7 +80,7 @@ public class DeliveryFeeControllerTest {
         // Get timestamp of imported weather information
         Long timestamp = weatherRepository
                 .findByNameOrderByTimestampDesc("Tartu-Tõravere")
-                .getFirst()
+                .get(0)
                 .getTimestamp();
 
         Delivery delivery = new Delivery("Tartu", "Car", timestamp);

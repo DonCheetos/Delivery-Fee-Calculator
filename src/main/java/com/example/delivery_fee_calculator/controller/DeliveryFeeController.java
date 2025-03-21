@@ -110,7 +110,7 @@ public class DeliveryFeeController {
             return ResponseEntity.badRequest().body(Map.of("error", "Weather data not available"));
         }
         // Retrieve the first available weather record
-        Weather weather = weatherList.getFirst();
+        Weather weather = weatherList.get(0);
 
         // Calculate the delivery fee with provided city, vehicle and weather information
         Double fee = deliveryFeeService.deliveryFeeCalculator(city,vehicle,weather.getTemp(),weather.getWind(),weather.getPhenomenon());
