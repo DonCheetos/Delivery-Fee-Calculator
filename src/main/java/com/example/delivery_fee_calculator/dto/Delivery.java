@@ -1,4 +1,4 @@
-package com.example.delivery_fee_calculator.entity;
+package com.example.delivery_fee_calculator.dto;
 
 import lombok.NonNull;
 

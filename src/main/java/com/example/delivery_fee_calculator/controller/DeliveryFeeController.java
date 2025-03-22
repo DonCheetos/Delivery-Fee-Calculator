@@ -1,6 +1,6 @@
 package com.example.delivery_fee_calculator.controller;
 
-import com.example.delivery_fee_calculator.entity.Delivery;
+import com.example.delivery_fee_calculator.dto.Delivery;
 import com.example.delivery_fee_calculator.entity.Weather;
 import com.example.delivery_fee_calculator.service.WeatherService;
 import com.example.delivery_fee_calculator.service.fee.DeliveryFeeService;

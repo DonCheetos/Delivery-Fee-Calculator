@@ -1,6 +1,6 @@
 package com.example.delivery_fee_calculator.service.controller;
 
-import com.example.delivery_fee_calculator.entity.Delivery;
+import com.example.delivery_fee_calculator.dto.Delivery;
 import com.example.delivery_fee_calculator.repository.WeatherRepository;
 import com.example.delivery_fee_calculator.service.WeatherImportService;
 import org.json.JSONException;
